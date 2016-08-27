@@ -91,6 +91,8 @@ svcRBF.fit(X, Y)
 
 # Create new data points.
 newData = np.array([[4, 2],[6,3],[7,3.5],[3,4],[5,2.5],[5,4],[5,2]])
+
+# Do predictions.
 predictionLinear = svcLinear.predict(newData)
 predictionPoly = svcPoly.predict(newData)
 predictionRBF = svcRBF.predict(newData)
