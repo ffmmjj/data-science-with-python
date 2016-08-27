@@ -23,14 +23,12 @@ matplotlib.use('Qt4Agg')
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.colors import ListedColormap
 
 from sklearn import svm
 from sklearn import datasets
 
-def plotIrisData(figureNumber, X, y):
-	plt.figure(figureNumber, figsize=(8, 6))
-	plt.clf()
-
+def plotIrisData(figure, X, y):
 	plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.Paired)
 	plt.xlabel('Sepal length')
 	plt.ylabel('Sepal width')
@@ -40,6 +38,17 @@ def plotIrisData(figureNumber, X, y):
 	plt.xticks(())
 	plt.yticks(())
 
+def plotDecisionBoundary(figure, X, Y, Z):
+	# Create color maps
+	cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA', '#AAAAFF'])
+	cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
+
+	# Put the result into a color plot
+	Z = Z.reshape(xx.shape)
+
+	plt.pcolormesh(X, Y, Z, cmap=cmap_light)
+
+# Load the dataset.
 iris = datasets.load_iris()
 
 X = iris.data[:, :2]  # We only take the first two features.
@@ -49,18 +58,38 @@ Y = iris.target
 x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
 y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
 
-# Plot training points.
-plotIrisData(1, X, Y)
-
 svc = svm.SVC(kernel='linear')
 
 # Train the model.
 svc.fit(X, Y) 
 
+# Create new data points.
 newData = np.array([[4, 2],[6,3],[7,3.5],[3,4],[5,2.5],[5,4],[5,2]])
 prediction = svc.predict(newData)
 
+h = .02
+xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                     np.arange(y_min, y_max, h))
+
+# Predict values for descision boundary.
+Z = svc.predict(np.c_[xx.ravel(), yy.ravel()])
+
+# Create first figure.
+figure = plt.figure()
+
+# Plot decision boundary.
+plotDecisionBoundary(figure, xx, yy, Z)
+
+# Plot training points.
+plotIrisData(figure, X, Y)
+
+# Create second figure.
+figure = plt.figure()
+
+# Plot decision boundary.
+plotDecisionBoundary(figure, xx, yy, Z)
+
 # Plot predicted points.
-plotIrisData(2, newData, prediction)
+plotIrisData(figure, newData, prediction)
 
 plt.show()
